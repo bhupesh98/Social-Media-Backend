@@ -6,7 +6,7 @@ const getFileType = (file) => {
 
 const generateFileName = (req,file,cb) => {
     const filename ="profilePhoto-" + req.userId + "." + getFileType(file);
-    req.profilePicture = `localhost:${process.env.PORT}/uploads/profilePhoto/${filename}`
+    req.body.profilePicture = `localhost:${process.env.PORT}/uploads/profilePhoto/${filename}`
     cb(null,filename);
 }
 
