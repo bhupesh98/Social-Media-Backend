@@ -14,6 +14,10 @@ const postSchema = mongoose.Schema({
         type: String,
         require: true
     },
+    category: {
+        type: String,
+        default: "all"
+    },
     likes: [{ 
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"

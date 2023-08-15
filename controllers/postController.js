@@ -129,10 +129,40 @@ const allPost = async (req,res) => {
     }
 }
 
+const communityPost = async (req,res) => {
+    try {
+        let posts;
+        if (req.params.category == "all") {
+            posts = await PostModel.find({});
+        }
+        else {
+            posts = await PostModel.find({
+                category: req.params.category 
+            })
+        }
+        if (posts.length) {
+            res.status(200).json({
+                posts: posts
+            });
+        }
+        else {
+            res.status(404).json({
+                message: "No community posts Found",
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+          message: "Failed to fetch community posts, Error",
+        });
+    }
+};
+
 module.exports = {
     createPost,
     deletePost,
     getPost,
     likeUnlikePost,
-    allPost
+    allPost,
+    communityPost
 };

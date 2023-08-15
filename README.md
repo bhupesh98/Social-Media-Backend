@@ -98,7 +98,8 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
   - `GET /post/:postId/view:` Get a specific post.
   - `GET /post/:postId/like:` Like or unlike a post.
   - `DELETE /post/:postId/delete:` Delete a post.
-  - `GET /:userId/allPost:` Get posts with pagination.
+  - `GET /post/:userId/allPost:` Get posts with pagination.
+  - `GET /post/:category:` Get community post. (If you don't want to set category, use "all" in :category)
 - Reel Routes:
   - `POST /reel/add:` Create a new reel.
     ```json
@@ -110,7 +111,7 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
   - `GET /reel/:reelId/view:` Get a specific reel.
   - `GET /reel/:reelId/like:` Like or unlike a reel.
   - `DELETE /reel/:reelId/delete:` Delete a reel.
-  - `GET /:userId/allReel:` Get reels with pagination.
+  - `GET reel/:userId/allReel:` Get reels with pagination.
 - User Routes:
   - `GET /user/profile/:username/view:` Get user profile.
   - `PUT /user/profile/update` Update user profile. (If sending image alongwith other updates use form-data)

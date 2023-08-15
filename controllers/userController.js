@@ -8,9 +8,10 @@ const profileUpdate = async (req,res) => {
             const salt = await bcrypt.genSalt(12);
             req.body.password = await bcrypt.hash(req.body.password,salt);
         }
+        const {followers,followings,...updateData} = req.body;
         const yourselfUser = await UserModel.findOneAndUpdate(
             {_id: req.userId }, /*Find filter*/
-            {$set: req.body }, /*Update filer*/
+            {$set: updateData }, /*Update filer*/
             {new: false} /*Old Document to return*/
         );
         if (!yourselfUser) {
@@ -19,8 +20,6 @@ const profileUpdate = async (req,res) => {
             });
         }
 
-        await
-        yourselfUser.profilePicture
         res.status(200).json({
             message: "Profile updated successfully",
         })
