@@ -21,15 +21,16 @@ const signin = async (req,res) => {
         }
 
         const payLoad = {
-            email: existingUser.email,
             userId: existingUser._id
         }
         const token = jwt.sign(payLoad,process.env.JWT_SECRET_KEY);
-
+        res.cookie("token",token,{
+            httpOnly: true
+        });
+        const {password,__v,...data} = existingUser;
         res.status(200).json({
             message: "User has been logged In",
-            user: existingUser,
-            token: token
+            user: data
         });
 
     } catch (error) {
@@ -42,13 +43,16 @@ const signin = async (req,res) => {
 
 // New user signin
 const signup = async (req,res) => {
-    const {email,password} = req.body;
+    const {username,email,password} = req.body;
     try {
 
         // Checking if user exists
-        const existingUser = await UserModel.findOne({email: email});
+        const existingUser = await UserModel.findOne({
+            $or :[{email: email},
+                {username: username }]
+        });
         if (existingUser) {
-            return res.status(400).json({message: "User Exists"});
+            return res.status(400).json({message: "Username or Email Exists"});
         }
 
         // Password Encryption
@@ -61,15 +65,16 @@ const signup = async (req,res) => {
         await createUser.save();
         // Token Generation
         const payLoad = {
-            email: createUser.email,
             userId: createUser._id
         }
         const token = jwt.sign(payLoad,process.env.JWT_SECRET_KEY);
-        
+        res.cookie("token",token,{
+            httpOnly: true
+        });
+        const {password,__v,...data} = createUser;
         res.status(201).json({
             message: "User has been Created",
-            user: createUser,
-            token: token
+            user: data
         });
 
     } catch (error) {
@@ -80,7 +85,15 @@ const signup = async (req,res) => {
     }
 };
 
+const logout = async (req,res) => {
+    res.clearCookie("token");
+    res.status(200).json({
+        message: "You have been logged out"
+    });
+}
+
 module.exports = {
     signin,
-    signup
+    signup,
+    logout
 };

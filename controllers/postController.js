@@ -1,6 +1,7 @@
 const PostModel = require('../models/Post');
 const CommentModel = require('../models/Comment');
 const fs = require('fs');
+const mongoose = require('mongoose');
 
 const createPost = async (req,res) => {
     try {
@@ -9,10 +10,10 @@ const createPost = async (req,res) => {
         req.body.imageURL = req.imageURL;
         const newPost = await new PostModel(req.body);
         await newPost.save();
+        const {user,__v,...data} = newPost._doc;
         res.status(200).json({
             message: "Post has been created",
-            postId: newPost._id,
-            data: newPost._doc
+            data: data
         });
 
     } catch (error) {
@@ -65,7 +66,8 @@ const getPost = async (req,res) => {
     try {
         const viewPost = await PostModel.findById(req.params.postId).populate("comment");
         if (viewPost) {
-            res.status(200).json(viewPost);
+            const {__v,user,...data} = viewPost;
+            res.status(200).json(data);
         }
         else {
             res.status(404).json({
@@ -124,30 +126,41 @@ const allPost = async (req,res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send({
-          message: "Failed to fetch all posts, Error",
+            message: "Failed to fetch all posts, Error",
         });
     }
 }
 
 const communityPost = async (req,res) => {
     try {
-        let posts;
-        if (req.params.category == "all") {
-            posts = await PostModel.find({});
+        let posts,lastPostId;
+        if (req.cookies.lastPostId) {
+            lastPostId = new mongoose.Types.ObjectId(req.cookies.lastPostId);
         }
         else {
-            posts = await PostModel.find({
-                category: req.params.category 
-            })
+            lastPostId = null;
+        }
+        let query = {};
+        if (lastPostId !== null) {
+            query._id = { $lt: lastPostId };
+        }
+        if (req.params.category == "all") {
+            posts = await PostModel.find(query).sort({ _id: -1}).limit(20);
+        }
+        else {
+            query.category = req.params.category;
+            posts = await PostModel.find(query).sort({ _id: -1}).limit(20);
         }
         if (posts.length) {
+            res.cookie("lastPostId",posts.pop()._id.toString());
             res.status(200).json({
                 posts: posts
             });
         }
         else {
+            res.clearCookie("lastPostId");
             res.status(404).json({
-                message: "No community posts Found",
+                message: "No more community posts Found",
             });
         }
     } catch (error) {

@@ -17,17 +17,16 @@ const addComment = async (req,res) => {
         comment.postId = req.params.postId;
         const createComment = await new CommentModel(comment);
         const commentSave = await createComment.save();
+        console.log(comment.postId);
         await PostModel.updateOne(
-            {_id: post._id},
+            {_id: comment.postId},
             {$push: {
                 comment: commentSave._id
-            }});
-
-        await
-
+        }});
+        const {__v,...data} = comment;
         res.status(200).json({
             message: "Comment has been created",
-            data: comment
+            data: data
         });
 
     } catch (error) {
@@ -44,7 +43,8 @@ const viewComments = async (req,res) => {
         const post = await PostModel.findOne({
             _id: postId
         }).populate("comment");
-
+        console.log(post);
+        console.log(post.comment);
         if (post) {
             if (post.comment.length) {
                 res.status(200).json({

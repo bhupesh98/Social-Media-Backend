@@ -7,11 +7,10 @@ const createReel = async (req,res) => {
         req.body.user = req.userId;
         req.body.reelURL = req.reelURL;
         const newReel = await new reelModel(req.body);
-        const {_id,__v,...otherData} = newReel._doc;
+        const {__v,...otherData} = newReel._doc;
         await newReel.save();
         res.status(200).json({
             message: "Reel has been created",
-            reelId: newReel._id,
             data: otherData
         });
 
@@ -61,7 +60,8 @@ const getReel = async (req,res) => {
     try {
         const viewReel = await reelModel.findById(req.params.reelId);
         if (viewReel) {
-            res.status(200).json(viewReel);
+            const {__v,...data} = newReel;
+            res.status(200).json(data);
         }
         else {
             res.status(404).json({

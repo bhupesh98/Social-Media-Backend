@@ -42,7 +42,6 @@ const viewProfile = async (req,res) => {
             const { password,__v,...otherInfo } = user._doc;
             res.status(200).json({
               status: "success",
-              message: "user info",
               user: otherInfo,
             });
         }
@@ -71,7 +70,7 @@ const followUser = async (req,res) => {
             username: req.params.username
         });
         if (userToFollow) {
-            if (userToFollow.followers.includes(userToFollow)) {
+            if (userToFollow.followers.includes(yourselfUser._id)) {
                 res.status(400).json({
                     message: "You already follow this user"
                 })
@@ -121,7 +120,7 @@ const unfollowUser = async (req,res) => {
         });
 
         if (userToUnfollow) {
-            if (userToUnfollow.followers.includes(userToUnfollow)) {
+            if (userToUnfollow.followers.includes(yourselfUser._id)) {
                 await yourselfUser.updateOne({
                     $pull: {
                         followings: userToUnfollow._id 
