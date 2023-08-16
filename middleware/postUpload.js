@@ -1,4 +1,5 @@
 const multer = require('multer');
+const websiteURL = require('../config/envConfig');
 
 const getFileType = (file) => {
     return  file.mimetype.split('/').pop();
@@ -6,7 +7,7 @@ const getFileType = (file) => {
 
 const generateFileName = (req,file,cb) => {
     const filename = Date.now() + "-post-" + req.userId + "." + getFileType(file);
-    req.imageURL = `localhost:${process.env.PORT}/uploads/posts/${filename}`;
+    req.imageURL = `${websiteURL}/uploads/posts/${filename}`;
     cb(null,filename);
 }
 
