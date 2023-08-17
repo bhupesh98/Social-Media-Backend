@@ -12,7 +12,7 @@ const postSchema = mongoose.Schema({
     },
     imageURL: {
         type: String,
-        require: true
+        required: true
     },
     category: {
         type: String,

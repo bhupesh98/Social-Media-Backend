@@ -7,12 +7,12 @@ const commentSchema = mongoose.Schema({
     },
     postId: {
         type: String,
-        require: true
+        required: true
     },
     comment: {
         type: String,
         max: 100,
-        require: true
+        required: true
     }
 },
 {

@@ -12,7 +12,7 @@ const reelSchema = mongoose.Schema({
     },
     reelURL: {
         type: String,
-        require: true
+        required: true
     },
     likes: [{ 
         type: mongoose.Schema.Types.ObjectId,
