@@ -66,7 +66,7 @@ const getPost = async (req,res) => {
     try {
         const viewPost = await PostModel.findById(req.params.postId).populate("comment");
         if (viewPost) {
-            const {__v,user,...data} = viewPost;
+            const {__v,user,...data} = viewPost._doc;
             res.status(200).json(data);
         }
         else {

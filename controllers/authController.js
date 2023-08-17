@@ -5,15 +5,14 @@ const UserModel = require('../models/User');
 
 // Existing User Login
 const signin = async (req,res) => {
-    const {email,password} = req.body;
     try {
-        const existingUser = await UserModel.findOne({email: email});
+        const existingUser = await UserModel.findOne({email: req.body.email});
         if (!existingUser) {
             return res.status(404).json({
                 message: "User Not Found"
             });
         }
-        const matchPassword = await bcrypt.compare(password,existingUser.password);
+        const matchPassword = await bcrypt.compare(req.body.password,existingUser.password);
         if (!matchPassword) {
             return res.status(400).json({
                 message: "Invalid email or password"
