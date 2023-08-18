@@ -42,13 +42,12 @@ const signin = async (req,res) => {
 
 // New user signin
 const signup = async (req,res) => {
-    const {username,email,password} = req.body;
     try {
 
         // Checking if user exists
         const existingUser = await UserModel.findOne({
-            $or :[{email: email},
-                {username: username }]
+            $or :[{email: req.body.email},
+                {username: req.body.username }]
         });
         if (existingUser) {
             return res.status(400).json({message: "Username or Email Exists"});
@@ -56,7 +55,7 @@ const signup = async (req,res) => {
 
         // Password Encryption
         const saltRounds = await bcrypt.genSalt(12 /*Salt Rounds*/);
-        const encryptPassword = await bcrypt.hash(password,saltRounds);
+        const encryptPassword = await bcrypt.hash(req.body.password,saltRounds);
         req.body.password = encryptPassword;
 
         //create new Account
@@ -70,7 +69,7 @@ const signup = async (req,res) => {
         res.cookie("token",token,{
             httpOnly: true
         });
-        const {password,__v,...data} = createUser;
+        const {password,__v,...data} = createUser._doc;
         res.status(201).json({
             message: "User has been Created",
             user: data
