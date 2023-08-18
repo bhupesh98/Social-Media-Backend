@@ -16,7 +16,6 @@ const createPost = async (req,res) => {
             folder : "posts",
             format: "png",
             allowed_formats: ["png","jpg","jpeg"],
-            overwrite: true,
             public_id: `${Date.now()}-post-${req.userId}`,
             overwrite: false,
 
