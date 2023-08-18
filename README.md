@@ -48,7 +48,7 @@ Welcome to the documentation for the Social Media Backend Application. This appl
 
 ### 1. Configure the application:
 Edit the `config/config.js` file and provide the necessary database connection details and any other required configurations.
-Remember, this will be a new environment, so to run you need to have your own <span style="color:red">PORT</span>, <span style="color:red">mongoURI</span>  URL and <span style="color:red">JWT_SECRET_KEY</span>.
+Remember, this will be a new environment, so to run you need to have your own <span style="color:red">PORT</span>, <span style="color:red">mongoURI</span>  URL, <span style="color:red">JWT_SECRET_KEY</span> and <span style="color:red">NODE_ENV</span> = "localhost".
 
 ### 2. Start the Application:
    ```cmd
