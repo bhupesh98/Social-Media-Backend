@@ -26,7 +26,7 @@ const signin = async (req,res) => {
         res.cookie("token",token,{
             httpOnly: true
         });
-        const {password,__v,...data} = existingUser;
+        const {password,__v,...data} = existingUser._doc;
         res.status(200).json({
             message: "User has been logged In",
             user: data
