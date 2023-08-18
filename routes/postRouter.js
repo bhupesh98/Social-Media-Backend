@@ -2,7 +2,7 @@ const express = require('express');
 const postRouter = express.Router();
 const postController = require('../controllers/postController');
 const authToken = require('../middleware/authMiddleware');
-const postUpload = require('../middleware/postUpload');
+const postUpload = require('../middleware/multerMiddleware');
 
 postRouter.post("/add", authToken , postUpload.single('image') , postController.createPost);
 postRouter.get("/:postId/view", postController.getPost);

@@ -10,9 +10,15 @@ const postSchema = mongoose.Schema({
         max: 150,
         default: ""
     },
-    imageURL: {
-        type: String,
-        required: true
+    postImage: {
+        URL: {
+            type: String,
+            required: true
+        },
+        publicId: {
+            type: String,
+            required: true
+        }
     },
     category: {
         type: String,

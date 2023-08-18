@@ -47,8 +47,8 @@ Welcome to the documentation for the Social Media Backend Application. This appl
 ## Usage
 
 ### 1. Configure the application:
-Edit the `config/config.js` file and provide the necessary database connection details and any other required configurations.
-Remember, this will be a new environment, so to run you need to have your own <span style="color:red">PORT</span>, <span style="color:red">mongoURI</span>  URL and <span style="color:red">JWT_SECRET_KEY</span>.
+Edit the `config/configDB.js` file and provide the necessary database connection details and any other required configurations.
+Remember, this will be a new environment, so to run you need to have your own mongoURI,JWT_SECRET_KEY,PORT,CLOUD_NAME,CLOUD_API_KEY,CLOUD_API_SECRET.Cloud stuff is for cloudinary. It is designed to run bydefault on `localhost`, change `config/envConfig.js` and NODE_ENV to host on any web service provider.
 
 ### 2. Start the Application:
    ```cmd
@@ -56,8 +56,7 @@ Remember, this will be a new environment, so to run you need to have your own <s
    ```
 
 ### PS:
-This server will start running at `http://localhost:8080` by default.
-But it is recommeded to enter <span style="color:red">PORT</span> in a .env file otherwise, link of uploaded files can't be generated as it used <span style="color:red">process.env.PORT</span> for generating link.
+This server will start running at `http://localhost:8080` by default. But, environment variables need to be changed for full functionality.
 
 ## API Endpoints
 
@@ -76,13 +75,16 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     {
       "message": "User has been Created",
       "user": {
+        "profilePicture": {
+          "URL": "https://res.cloudinary.com/dfwcmubxu/image/upload/v1692381808/profilePhoto/profilePhoto-64df344ec1e263a6a296ce0a.png",
+          "publicId": "profilePhoto/profilePhoto-64df344ec1e263a6a296ce0a"
+        },
         "username": "Test",
         "email": "test@gmail.com",
         "description": "",
-        "profilePicture": "localhost:8080/uploads/profilePhoto/defaultProfile.png",
         "followers": [],
         "followings": [],
-        "_id": "64dca484eb4c70c49f8b535f",
+        "_id": "64df344ec1e263a6a296ce0a",
       }
     }
     ```
@@ -99,11 +101,14 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     {
     "message": "User has been logged In",
     "user": {
-        "_id": "64dca484eb4c70c49f8b535f",
+        "profilePicture": {
+          "URL": "https://res.cloudinary.com/dfwcmubxu/image/upload/v1692381808/profilePhoto/profilePhoto-64df344ec1e263a6a296ce0a.png",
+          "publicId": "profilePhoto/profilePhoto-64df344ec1e263a6a296ce0a"
+        },
+        "_id": "64df344ec1e263a6a296ce0a",
         "username": "Test",
         "email": "test@gmail.com",
         "description": "",
-        "profilePicture": "localhost:8080/uploads/profilePhoto/defaultProfile.png",
         "followers": [],
         "followings": [],
       }
@@ -165,9 +170,11 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     {
     "message": "Post has been created",
     "data": {
-        "user": "64dca484eb4c70c49f8b535f",
         "caption": "Hello test world",
-        "imageURL": "localhost:8080/uploads/posts/1692182379997-post-64dca484eb4c70c49f8b535f.png",
+        "postImage": {
+          "URL": "https://res.cloudinary.com/dfwcmubxu/image/upload/v1692383938/posts/1692383923303-post-64df344ec1e263a6a296ce0a.png",
+          "publicId": "posts/1692383923303-post-64df344ec1e263a6a296ce0a"
+        },
         "category": "test",
         "likes": [],
         "comment": [],
@@ -183,9 +190,12 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     **Response:**
     ```json
     {
+      "postImage": {
+        "URL": "https://res.cloudinary.com/dfwcmubxu/image/upload/v1692383938/posts/1692383923303-post-64df344ec1e263a6a296ce0a.png",
+        "publicId": "posts/1692383923303-post-64df344ec1e263a6a296ce0a"
+      },
       "_id": "64dca76ceb4c70c49f8b5362",
       "caption": "Hello test world",
-      "imageURL": "localhost:8080/uploads/posts/1692182379997-post-64dca484eb4c70c49f8b535f.png",
       "category": "test",
       "likes": [],
       "comment": [],
@@ -227,10 +237,13 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     {
     "posts": [
         {
+          "postImage": {
+            "URL": "https://res.cloudinary.com/dfwcmubxu/image/upload/v1692383938/posts/1692383923303-post-64df344ec1e263a6a296ce0a.png",
+            "publicId": "posts/1692383923303-post-64df344ec1e263a6a296ce0a"
+          },
           "_id": "64dca76ceb4c70c49f8b5362",
           "user": "64dca484eb4c70c49f8b535f",
           "caption": "Hello test world",
-          "imageURL": "localhost:8080/uploads/posts/1692182379997-post-64dca484eb4c70c49f8b535f.png",
           "category": "test",
           "likes": [
               "64dca484eb4c70c49f8b535f"
@@ -246,7 +259,7 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     }
     ```
 
-  - `GET /post/:category:` Get community post with pagination. (If you don't want to set category, use "all" in :category)
+  - `GET /post/:category:` Get community post with pagination. (If you don't want to set category, use "all" in :category).limit is set to 10 per request from new to older. If it ends, no more community post message is sent and if requested again it'll start from top to show posts.(Cookie used for this)
 
 
 - Reel Routes:
@@ -262,11 +275,16 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     {
       "message": "Reel has been created",
       "data": {
-        "_id": "64dcba8cff6b0cb621cc37a0",
-        "user": "64dca484eb4c70c49f8b535f",
+        "user": "64df344ec1e263a6a296ce0a",
         "caption": "Hello...test reel",
-        "reelURL": "localhost:8080/uploads/reels/1692187276112-reel-64dca484eb4c70c49f8b535f.mp4",
-        "likes": []
+        "reelVideo": {
+            "URL": "https://res.cloudinary.com/dfwcmubxu/video/upload/v1692384445/reels/1692384420466-reel-64df344ec1e263a6a296ce0a.mp4",
+            "publicId": "reels/1692384420466-reel-64df344ec1e263a6a296ce0a"
+        },
+        "likes": [],
+        "_id": "64dfbcc03b369e54292f11b8",
+        "createdAt": "2023-08-18T18:47:28.239Z",
+        "updatedAt": "2023-08-18T18:47:28.239Z"
       }
     }
     ```
@@ -275,14 +293,16 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     **Response:**
     ```json
     {
-      "_id": "64dcba8cff6b0cb621cc37a0",
-      "user": "64dca484eb4c70c49f8b535f",
+      "reelVideo": {
+        "URL": "https://res.cloudinary.com/dfwcmubxu/video/upload/v1692384445/reels/1692384420466-reel-64df344ec1e263a6a296ce0a.mp4",
+        "publicId": "reels/1692384420466-reel-64df344ec1e263a6a296ce0a"
+      },
+      "_id": "64dfbcc03b369e54292f11b8",
+      "user": "64df344ec1e263a6a296ce0a",
       "caption": "Hello...test reel",
-      "reelURL": "localhost:8080/uploads/reels/1692187276112-reel-64dca484eb4c70c49f8b535f.mp4",
       "likes": [],
-      "createdAt": "2023-08-16T12:01:16.158Z",
-      "updatedAt": "2023-08-16T12:01:16.158Z",
-      "__v": 0
+      "createdAt": "2023-08-18T18:47:28.239Z",
+      "updatedAt": "2023-08-18T18:47:28.239Z"
     }
     ```
 
@@ -318,13 +338,16 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     {
     "reels": [
         {
-          "_id": "64dcba8cff6b0cb621cc37a0",
-          "user": "64dca484eb4c70c49f8b535f",
+          "reelVideo": {
+            "URL": "https://res.cloudinary.com/dfwcmubxu/video/upload/v1692384445/reels/1692384420466-reel-64df344ec1e263a6a296ce0a.mp4",
+            "publicId": "reels/1692384420466-reel-64df344ec1e263a6a296ce0a"
+          },
+          "_id": "64dfbcc03b369e54292f11b8",
+          "user": "64df344ec1e263a6a296ce0a",
           "caption": "Hello...test reel",
-          "reelURL": "localhost:8080/uploads/reels/1692187276112-reel-64dca484eb4c70c49f8b535f.mp4",
           "likes": [],
-          "createdAt": "2023-08-16T12:01:16.158Z",            "updatedAt": "2023-08-16T12:06:23.608Z",
-          "__v": 0
+          "createdAt": "2023-08-18T18:47:28.239Z",
+          "updatedAt": "2023-08-18T18:47:28.239Z"
         }
       ]
     }
@@ -337,11 +360,14 @@ But it is recommeded to enter <span style="color:red">PORT</span> in a .env file
     {
       "status": "success",
       "user": {
-        "_id": "64dca484eb4c70c49f8b535f",
+        "profilePicture": {
+          "URL": "https://res.cloudinary.com/dfwcmubxu/image/upload/v1692381808/profilePhoto/profilePhoto-64df344ec1e263a6a296ce0a.png",
+          "publicId": "profilePhoto/profilePhoto-64df344ec1e263a6a296ce0a"
+        },
+        "_id": "64df344ec1e263a6a296ce0a",
         "username": "Test",
         "email": "test@gmail.com",
         "description": "",
-        "profilePicture": "localhost:8080/uploads/profilePhoto/defaultProfile.png",
         "followers": [],
         "followings": []
       }

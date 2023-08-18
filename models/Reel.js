@@ -10,9 +10,15 @@ const reelSchema = mongoose.Schema({
         max: 150,
         default: ""
     },
-    reelURL: {
-        type: String,
-        required: true
+    reelVideo: {
+        URL: {
+            type: String,
+            required: true
+        },
+        publicId: {
+            type: String,
+            required: true
+        }
     },
     likes: [{ 
         type: mongoose.Schema.Types.ObjectId,

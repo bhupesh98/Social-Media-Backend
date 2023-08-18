@@ -1,14 +1,28 @@
 const reelModel = require('../models/Reel');
-const fs = require('fs');
+const cloudinary = require('../config/cloudinaryConfig');
+const getDataURI = require('../utils/dataURIparser');
 
 const createReel = async (req,res) => {
     try {
         // Adding user in reel's user
         req.body.user = req.userId;
-        req.body.reelURL = req.reelURL;
+        const dataURI = getDataURI(req.file);
+
+        const reelUpload = await cloudinary.uploader.upload((await dataURI).content,{
+            resource_type: "video",
+            folder: "reels",
+            format: "webm",
+            allowed_formats: ["mp4","webm","mkv"],
+            public_id: `${Date.now()}-reel-${req.userId}`,
+            overwrite: false
+        });
+        req.body.reelVideo = {
+            URL: reelUpload.secure_url,
+            publicId: reelUpload.public_id
+        };
         const newReel = await new reelModel(req.body);
-        const {__v,...otherData} = newReel._doc;
         await newReel.save();
+        const {__v,...otherData} = newReel._doc;
         res.status(200).json({
             message: "Reel has been created",
             data: otherData
@@ -27,21 +41,14 @@ const deleteReel = async (req,res) => {
     try {
         const reelDelete = await reelModel.findById(req.params.reelId);
         if (reelDelete) {
-            if (req.userId === reelDelete.user.toString()) {
-
-                const filename = reelDelete.reelURL.split('/').pop();
-                fs.unlink(`./uploads/reels/${filename}`,(err)=> {});
-                await reelModel.findByIdAndDelete(req.params.reelId);
-                
-                res.status(200).json({
-                    message: "Reel has been deleted",
-                });
-            }
-            else {
-                res.status(401).json({
-                    message: "Unauthorized"
-                });
-            }
+            await cloudinary.uploader.destroy(reelDelete.reelVideo.publicId,{
+                resource_type: "video"
+            });
+            await reelModel.findByIdAndDelete(req.params.reelId);
+    
+            res.status(200).json({
+                message: "Reel has been deleted",
+            });
         }
         else {
             res.status(404).json({
@@ -60,7 +67,7 @@ const getReel = async (req,res) => {
     try {
         const viewReel = await reelModel.findById(req.params.reelId);
         if (viewReel) {
-            const {__v,...data} = newReel;
+            const {__v,...data} = viewReel._doc;
             res.status(200).json(data);
         }
         else {

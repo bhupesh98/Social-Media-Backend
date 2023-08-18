@@ -1,29 +1,43 @@
 const UserModel = require('../models/User');
 const bcrypt = require('bcrypt');
+const cloudinary = require('../config/cloudinaryConfig');
+const getDataURI = require('../utils/dataURIparser');
 
 const profileUpdate = async (req,res) => {
     try {
         // If password update is requested
-        if (req.body.password) {
-            const salt = await bcrypt.genSalt(12);
-            req.body.password = await bcrypt.hash(req.body.password,salt);
-        }
-        const {followers,followings,...updateData} = req.body;
-        const yourselfUser = await UserModel.findOneAndUpdate(
-            {_id: req.userId }, /*Find filter*/
-            {$set: updateData }, /*Update filer*/
-            {new: false} /*Old Document to return*/
-        );
+        var yourselfUser = await UserModel.findById(req.userId);
         if (!yourselfUser) {
             res.status(400).json({
                 message: "Can't update, Profile not found"
             });
         }
+        if (req.body.password) {
+            const salt = await bcrypt.genSalt(12);
+            req.body.password = await bcrypt.hash(req.body.password,salt);
+        }
 
-        res.status(200).json({
+        if (req.file) {
+            const dataURI = getDataURI(req.file);
+            const profileUplaod = await cloudinary.uploader.upload((await dataURI).content,{
+                resource_type: "image",
+                folder: "profilePhoto",
+                allowed_formats: ["jpg","png","jpeg"],
+                format: "png",
+                public_id: `profilePhoto-${req.userId}`,
+                overwrite: true
+            });
+            req.body.profilePicture = {
+                URL:  profileUplaod.secure_url,
+                publicId: profileUplaod.public_id
+            };
+        }
+        const {followers,followings,...updateData} = req.body;
+        yourselfUser = await UserModel.findByIdAndUpdate(req.userId,{
+            $set: updateData
+        }).then(res.status(200).json({
             message: "Profile updated successfully",
-        })
-
+        }));
     } catch (error) {
         console.error(error);
         res.status(500).json({

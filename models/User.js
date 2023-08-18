@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const websiteURL = require('../config/envConfig');
 
 const UserSchema = mongoose.Schema({
   username: {
@@ -21,8 +22,14 @@ const UserSchema = mongoose.Schema({
     default: ""
   },
   profilePicture: {
-    type: String,
-    default: `localhost:${process.env.PORT}/uploads/profilePhoto/defaultProfile.png`
+    URL: {
+      type: String,
+      default: `${websiteURL}/uploads/profilePhoto/defaultProfile.png`
+    },
+    publicId: {
+      type: String,
+      default: ""
+    }
   },
   followers: [{
     type: mongoose.Schema.Types.ObjectId,

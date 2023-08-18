@@ -2,7 +2,7 @@ const express = require('express');
 const reelRouter = express.Router();
 const reelController = require('../controllers/reelController');
 const authToken = require('../middleware/authMiddleware');
-const reelUpload = require('../middleware/reelUpload');
+const reelUpload = require('../middleware/multerMiddleware');
 
 reelRouter.post("/add", authToken , reelUpload.single('video') , reelController.createReel);
 reelRouter.get("/:reelId/view", reelController.getReel);

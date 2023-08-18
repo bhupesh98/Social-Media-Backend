@@ -1,13 +1,30 @@
 const PostModel = require('../models/Post');
 const CommentModel = require('../models/Comment');
-const fs = require('fs');
 const mongoose = require('mongoose');
+const cloudinary = require('../config/cloudinaryConfig');
+const getDataURI = require('../utils/dataURIparser');
 
 const createPost = async (req,res) => {
     try {
         // Adding user in post's user
         req.body.user = req.userId;
-        req.body.imageURL = req.imageURL;
+
+        const dataURI = getDataURI(req.file);
+
+        const imageUpload = await cloudinary.uploader.upload((await dataURI).content,{
+            resource_type: "image",
+            folder : "posts",
+            format: "png",
+            allowed_formats: ["png","jpg","jpeg"],
+            overwrite: true,
+            public_id: `${Date.now()}-post-${req.userId}`,
+            overwrite: false,
+
+        });
+        req.body.postImage = {
+            URL: imageUpload.secure_url,
+            publicId: imageUpload.public_id
+        };
         const newPost = await new PostModel(req.body);
         await newPost.save();
         const {user,__v,...data} = newPost._doc;
@@ -29,25 +46,19 @@ const deletePost = async (req,res) => {
     try {
         const postDelete = await PostModel.findById(req.params.postId);
         if (postDelete) {
-            if (req.userId === postDelete.user.toString()) {
-                // Since comments are stored in different document which are stored referenced here.
-                //  So, comment needs to be deleted first.
-                const filename = postDelete.imageURL.split('/').pop();
-                fs.unlink(`./uploads/posts/${filename}`,(err) => {});
-                await CommentModel.deleteMany({
-                    postId: postDelete._id
-                });
-                await PostModel.findByIdAndDelete(req.params.postId);
-                
-                res.status(200).json({
-                    message: "Post has been deleted",
-                });
-            }
-            else {
-                res.status(401).json({
-                    message: "Unauthorized"
-                });
-            }
+            // Since comments are stored in different document which are stored referenced here.
+            //  So, comment needs to be deleted first.
+            await cloudinary.uploader.destroy(postDelete.postImage.publicId,{
+                resource_type: "image"
+            });
+            await CommentModel.deleteMany({
+                postId: postDelete._id
+            });
+            await PostModel.findByIdAndDelete(req.params.postId);
+            
+            res.status(200).json({
+                message: "Post has been deleted",
+            });
         }
         else {
             res.status(404).json({
@@ -145,11 +156,11 @@ const communityPost = async (req,res) => {
             query._id = { $lt: lastPostId };
         }
         if (req.params.category == "all") {
-            posts = await PostModel.find(query).sort({ _id: -1}).limit(20);
+            posts = await PostModel.find(query).sort({ _id: -1}).limit(10);
         }
         else {
             query.category = req.params.category;
-            posts = await PostModel.find(query).sort({ _id: -1}).limit(20);
+            posts = await PostModel.find(query).sort({ _id: -1}).limit(10);
         }
         if (posts.length) {
             res.cookie("lastPostId",posts.pop()._id.toString());

@@ -11,9 +11,7 @@
 
 - **middleware/**
   - `authMiddleware.js`: Authentication middleware
-  - `postUpload.js`: Post Upload middleware using multer
-  - `profileUpload.js`: Profile Upload middleware using multer
-  - `reelUpload.js`: Reel Upload middleware using multer
+  - `multerMiddleware.js`: Initialized multer for storing file in memory and sending it to cloud
 
 - **models/**
   - `User.js`: User data model
@@ -27,10 +25,11 @@
   - `postRouter.js`: Post-related routes
   - `reelRouter.js`: Reel-related routes
 
- - **uploads/**
-    - **posts/** : Storing posts of all users
-    - **profilePhoto** : Storing profile photo of all users
-    - **reels/** : Storing reels of all users
+- **uploads/**
+  - `profilePhoto`: Contains default profile photo
+
+- **utils/**
+  - `dataURIparser.js`: It parses image/video for uploading in cloudinary
   <br></br>
 - `app.js`: Main Express application setup
 - `package.json`: Project dependencies
